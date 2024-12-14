@@ -1,58 +1,130 @@
+//============================================================================================================================
+#define ThresholdL 150
+#define ThresholdC 150
+#define ThresholdR 150
+
+#define MotorLF 10
+#define MotorLB 9
+#define MotorRF 5
+#define MotorRB 6
+
+
+#define SensorR A1
+#define SensorC A2
+#define SensorL A3
+
+#define LED                3
+#define Switch            A4
+
+//============================================================================================================================
+
+
+void setup() {
+  // put your setup code here, to run once:
+ pinMode(MotorLF  , OUTPUT);
+ pinMode(MotorLB  , OUTPUT);
+ pinMode(MotorRF  , OUTPUT);
+ pinMode(MotorRB  , OUTPUT);
+ pinMode(LED  , OUTPUT);
+
+ pinMode(SensorL  , INPUT);
+ pinMode(SensorC  , INPUT);
+ pinMode(SensorR  , INPUT);
+ pinMode(Switch  , INPUT_PULLUP);
+
+ analogWrite(MotorLF  , 0);
+ analogWrite(MotorLB  , 0);
+ analogWrite(MotorRF  , 0);
+ analogWrite(MotorRB  , 0);
+ digitalWrite(LED  , 0);
+ 
+ Serial.begin(115200);
+ while(digitalRead(Switch)==1){
+  Serial.print(analogRead(SensorL));
+  Serial.print(" : ");
+  Serial.print(analogRead(SensorC));
+  Serial.print(" : ");
+  Serial.println(analogRead(SensorR));
+ }
+  Serial.end();
+
+  while(digitalRead(Switch)==0)delay(100);
+
+  digitalWrite(LED , 1);
+
+}
+
+int count=0;
+//================================================================================================================================
+
 void loop() {
-  // 各センサーの値を読み取る
-  int sensorLValue = analogRead(SensorL);  // 左センサー
-  int sensorCValue = analogRead(SensorC);  // 中央センサー
-  int sensorRValue = analogRead(SensorR);  // 右センサー
+  // put your main code here, to run repeatedly:
+  
 
-  // センサーがすべて黒を検知しているか確認
-  if (sensorLValue < ThresholdL && sensorCValue < ThresholdC && sensorRValue < ThresholdR) {
-    count++;  // カウントを1追加
-    delay(500);  // 安定させるため少し遅延
-
-    // カウントが3に達したら停止
-    if (count >= 3) {
-      // モーターを完全停止
-      analogWrite(MotorLF, 0);
-      analogWrite(MotorLB, 0);
-      analogWrite(MotorRF, 0);
-      analogWrite(MotorRB, 0);
-
-      // LEDを点灯して終了を示す
-      digitalWrite(LED, HIGH);
-      while (true) {
-        // ここで無限ループにすることで停止を維持
-      }
-    }
-  } 
-  else if (sensorRValue < ThresholdR) {  // 右センサーが黒を検知
-    // 左車輪を反時計回り
-    analogWrite(MotorLF, 0);        
-    analogWrite(MotorLB, 255);      
-    analogWrite(MotorRF, 0);        
-    analogWrite(MotorRB, 0);        
-  } 
-  else if (sensorCValue < ThresholdC) {  // 中央センサーが黒を検知
-    // 両方の車輪を反時計回り
-    analogWrite(MotorLF, 0);        
-    analogWrite(MotorLB, 255);      
-    analogWrite(MotorRF, 0);        
-    analogWrite(MotorRB, 255);      
-  } 
-  else if (sensorLValue < ThresholdL) {  // 左センサーが黒を検知
-    // 右車輪を反時計回り
-    analogWrite(MotorLF, 0);        
-    analogWrite(MotorLB, 0);        
-    analogWrite(MotorRF, 0);        
-    analogWrite(MotorRB, 255);      
-  } 
-  else {
-    // どのセンサーも黒を検知しない場合、全てのモーターを停止
-    analogWrite(MotorLF, 0);
-    analogWrite(MotorLB, 0);
-    analogWrite(MotorRF, 0);
-    analogWrite(MotorRB, 0);
+ //count<3
+ if(analogRead(SensorR)<ThresholdR){
+    analogWrite(MotorLF , 100);
+    analogWrite(MotorLB , 0);
+    analogWrite(MotorRF , 0);
+    analogWrite(MotorRB , 0);
   }
 
-  // 処理を安定させるための小さな遅延
-  delay(50);
+  if(analogRead(SensorL)<ThresholdL){
+    analogWrite(MotorLF , 0);
+    analogWrite(MotorLB , 0);
+    analogWrite(MotorRF , 100);
+    analogWrite(MotorRB , 0);
+  }
+  if(analogRead(SensorC)<ThresholdC){
+    analogWrite(MotorLF , 100);
+    analogWrite(MotorLB , 0);
+    analogWrite(MotorRF , 100);
+    analogWrite(MotorRB , 0);
+  }
+  if(analogRead(SensorL)<ThresholdL&&analogRead(SensorC)<ThresholdC&&analogRead(SensorR)<ThresholdR && count<2){
+    analogWrite(MotorLF , 100);
+    analogWrite(MotorLB , 0);
+    analogWrite(MotorRF , 80);
+    analogWrite(MotorRB , 0);
+    count++;
+    delay(550);
+  }
+
+//    if(analogRead(SensorC)<ThresholdC){
+//    analogWrite(MotorLF , 100);
+//    analogWrite(MotorLB , 0);
+//    analogWrite(MotorRF , 100);
+//    analogWrite(MotorRB , 0);
+//  }
+//  if(analogRead(SensorL)<ThresholdL&&analogRead(SensorC)<ThresholdC&&analogRead(SensorR)<ThresholdR){
+//    analogWrite(MotorLF , 0);
+//    analogWrite(MotorLB , 0);
+//    analogWrite(MotorRF , 0);
+//    analogWrite(MotorRB , 0);
+//  }
+
+  if(analogRead(SensorL)<ThresholdL&&analogRead(SensorC)<ThresholdC&&analogRead(SensorR)<ThresholdR && count>=2)
+  {
+    analogWrite(MotorLF , 0);
+    analogWrite(MotorLB , 0);
+    analogWrite(MotorRF , 0);
+    analogWrite(MotorRF , 0);
+    delay(2000);
+  }
 }
+//#000000
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  //<h1>Hello! Word!!</h1>
