@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アドレスバーから Video ID 抽出</title>
+</head>
+<body>
+  <h1>Video ID 抽出ツール</h1>
+  <p id="result"></p>
+
+  <script>
+    // URLのクエリパラメータを取得する関数
+    function getQueryParam(param) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(param);
+    }
+
+    // videoid を取得して表示
+    const videoid = getQueryParam('v');
+    const resultElement = document.getElementById('result');
+
+    if (videoid) {
+      resultElement.textContent = `抽出された Video ID: ${videoid}`;
+    } else {
+      resultElement.textContent = 'Video ID が見つかりません。URLを確認してください。';
+    }
+  </script>
+</body>
+</html>
