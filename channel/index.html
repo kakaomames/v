@@ -3,12 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>チャンネル情報</title>
+</head>
+<body>
+  <h1>チャンネル情報</h1>
+
+  <div id="channel-info">
+    <!-- チャンネル情報を表示 -->
+  </div>
+
+  <script>
+    // URLを指定されたものに変更
+    const apiUrl = 'https://xn--56h2hd81038bqea0bm6birn7fz9e971bpar2f591b.easterndns.com';  // 任意のURLに変更
+
+    // URLからクエリパラメータを取得
+    const params = new URLSearchParams(window.location.search);
+    const channelId = params.get('c');  // チャンネルIDを取得
+
+    const channelInfoDiv = document.getElementById('channel-info');
+
+    if (channelId) {
+      // チャンネル情報を取得（Flask APIにGETリクエスト）
+      fetch(`${apiUrl}/channel/${channelId}`)
+        .then(response => response.text())  // HTMLを取得
+        .then(data => {
+          // チャンネル情報をページに表示
+          channelInfoDiv.innerHTML = data;
+        })
+        .catch(error => {
+          channelInfoDiv.textContent = 'チャンネル情報の取得に失敗しました。';
+          console.error('チャンネル情報取得エラー:', error);
+        });
+    } else {
+      channelInfoDiv.textContent = 'チャンネルIDがありません。URLを確認してください。';
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+
+<!--<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="title"></title>
 </head>
 <body>
   
   <div id="channel-info">
-    <!-- チャンネル情報を表示 -->
+    <!-- チャンネル情報を表示 -- >
   </div>
 
   <script>
@@ -45,4 +92,4 @@
     }
   </script>
 </body>
-</html>
+</html>-->
