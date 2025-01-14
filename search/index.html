@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube 検索結果</title>
+</head>
+<body>
+  <h1>YouTube 検索結果</h1>
+  <p>検索キーワード「<span id="search-word"></span>」の結果を表示します。</p>
+  
+  <div id="search-results">
+    <!-- 検索結果を表示 -->
+  </div>
+
+  <script>
+    const API_KEY = 'AIzaSyCfLrK2FPzEZllvwhjmugZ8Bwvzp6GRVpU'; // APIキー
+    const params = new URLSearchParams(window.location.search);
+    const searchWord = params.get('q'); // 検索ワードを取得
+
+    const searchWordDiv = document.getElementById('search-word');
+    const searchResultsDiv = document.getElementById('search-results');
+
+    if (searchWord) {
+      searchWordDiv.textContent = searchWord;
+
+      // 検索結果を取得（動画とチャンネル両方）
+      fetch(`https://www.googleapis.com/youtube/v3/search?q=${searchWord}&part=snippet&type=video,channel&maxResults=10&key=${API_KEY}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.items && data.items.length > 0) {
+            data.items.forEach(item => {
+              const type = item.id.kind; // アイテムの種類（動画 or チャンネル）
+              const title = item.snippet.title;
+              const description = item.snippet.description;
+              const thumbnail = item.snippet.thumbnails.default.url;
+              
+              if (type === 'youtube#video') {
+                // 動画の場合
+                const videoId = item.id.videoId;
+                searchResultsDiv.innerHTML += `
+                  <div>
+                    <h3><a href="/watch?v=${videoId}">${title}</a></h3>
+                    <p>${description}</p>
+                    <img src="${thumbnail}" alt="${title}" style="width:120px; height:90px;">
+                  </div>
+                `;
+              } else if (type === 'youtube#channel') {
+                // チャンネルの場合
+                const channelId = item.id.channelId;
+                const channelTitle = item.snippet.channelTitle;
+                const channelThumbnail = item.snippet.thumbnails.default.url;
+                
+                searchResultsDiv.innerHTML += `
+                  <div>
+                    <h3><a href="/channel/?c=${channelId}">${channelTitle}</a></h3>
+                    <img src="${channelThumbnail}" alt="${channelTitle}" style="width:120px; height:120px; border-radius:50%;">
+                    <p>${description}</p>
+                  </div>
+                `;
+              }
+            });
+          }
+        })
+        .catch(error => {
+          searchResultsDiv.textContent = '検索結果の取得に失敗しました。';
+          console.error('検索結果取得エラー:', error);
+        });
+    } else {
+      searchResultsDiv.textContent = '検索キーワードがありません。URLを確認してください。';
+    }
+  </script>
+</body>
+</html>
