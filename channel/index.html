@@ -70,7 +70,7 @@
               const thumbnail = item.snippet.thumbnails.default.url;
 
               // 通常動画を表示
-              if (!isShorts || (isShorts && item.snippet.duration && parseDuration(item.snippet.duration) <= 60)) {
+              if (!isShorts || (isShorts && item.snippet.duration && parseDuration(item.snippet.duration) <= 180)) {
                 channelVideosDiv.innerHTML += `
                   <div>
                     <h3><a href="/v/watch/?v=${videoId}">${title}</a></h3>
