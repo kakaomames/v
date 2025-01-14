@@ -3,9 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YouTube 動画詳細表示</title>
+  <title id="video-title"></title>
 </head>
 <body>
+  <form class="pure-form" action="/search" method="get">
+     <fieldset>
+          <input type="search" id="searchbox" autocomplete="on" autocorrect="on" autocapitalize="none" spellcheck="false" name="q" placeholder="検索" title="検索">
+     </fieldset>
+  </form>
   <h1>YouTube 動画詳細</h1>
   <p>アドレスバーのURLからVideo IDを取得して詳細を表示します。</p>
   
