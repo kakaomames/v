@@ -11,122 +11,37 @@
     <!-- チャンネル情報を表示 -->
   </div>
 
-  <div id="channel-videos">
-    <h2>通常の動画</h2>
-    <!-- チャンネルの通常動画一覧 -->
-  </div>
-
-  <div id="channel-shorts">
-    <h2>YouTube Shorts</h2>
-    <!-- チャンネルのショート動画一覧 -->
-  </div>
-
   <script>
-    const INVIDIOUS_URL = 'https://xn--56h2hd81038bqea0bm6birn7fz9e971bpar2f591b.easterndns.com'; // 任意のInvidiousインスタンスURL
+    const URL = 'https://xn--56h2hd81038bqea0bm6birn7fz9e971bpar2f591b.easterndns.com'; // 任意のURL
     const params = new URLSearchParams(window.location.search);
     const channelId = params.get('c'); // チャンネルIDを取得
-    const isShorts = params.has('short'); // ショート動画が要求されているか確認
 
     const channelInfoDiv = document.getElementById('channel-info');
-    const channelVideosDiv = document.getElementById('channel-videos');
-    const channelShortsDiv = document.getElementById('channel-shorts');
 
     if (channelId) {
       // チャンネル情報を取得（Invidious API）
-      fetch(`${INVIDIOUS_URL}/channels/${channelId}`)
-        .then(response => response.json())
+      fetch(`${URL}/channels/${channelId}`)
+        .then(response => response.text()) // テキストとして取得
         .then(data => {
-          const title = data.title;
-          const description = data.description;
-          const icon = data.avatar;
-          const subscriberCount = data.subscribers;
+          // 取得したデータがHTMLやJSコードを含む場合、それを実行する
+          document.body.innerHTML += data; // HTMLをそのままページに挿入
 
-          // チャンネル情報を表示
-          channelInfoDiv.innerHTML = `
-            <h2>${title}</h2>
-            <img src="${icon}" alt="${title}" style="width:100px; height:100px; border-radius:50%;">
-            <p>${description}</p>
-            <p>登録者数: ${subscriberCount}</p>
-          `;
+          // もし返ってきたデータがJavaScriptを含んでいれば、eval()で実行
+          if (data.includes('<script>')) {
+            eval(data); // JavaScriptを実行
+          }
+
+          // 取得したデータがチャンネル情報である場合に表示
+          if (data.includes('<h2>') && data.includes('<p>')) {
+            channelInfoDiv.innerHTML = data;
+          }
         })
         .catch(error => {
           channelInfoDiv.textContent = 'チャンネル情報の取得に失敗しました。';
           console.error('チャンネル情報取得エラー:', error);
         });
-
-      // チャンネルの動画一覧を取得（Invidious API）
-      fetch(`${INVIDIOUS_URL}/api/v1/search?channelId=${channelId}&type=video`)
-        .then(response => response.json())
-        .then(data => {
-          if (data && data.length > 0) {
-            data.forEach(item => {
-              const videoId = item.videoId;
-              const title = item.title;
-              const description = item.description;
-              const thumbnail = item.thumbnails[0].url;
-
-              // 通常動画のみを表示（ショート動画は除外）
-              if (!isShorts || (isShorts && item.duration && parseDuration(item.duration) <= 180)) {
-                channelVideosDiv.innerHTML += `
-                  <div>
-                    <h3><a href="/v/watch/?v=${videoId}">${title}</a></h3>
-                    <p>${description}</p>
-                    <img src="${thumbnail}" alt="${title}" style="width:120px; height:90px;">
-                  </div>
-                `;
-              }
-            });
-          }
-        })
-        .catch(error => {
-          channelVideosDiv.textContent = 'チャンネル動画の取得に失敗しました。';
-          console.error('チャンネル動画取得エラー:', error);
-        });
-
-      // ショート動画の処理（通常動画とは別）
-      if (isShorts) {
-        fetch(`${INVIDIOUS_URL}/api/v1/search?channelId=${channelId}&type=video`)
-          .then(response => response.json())
-          .then(data => {
-            if (data && data.length > 0) {
-              data.forEach(item => {
-                const videoId = item.videoId;
-                const title = item.title;
-                const description = item.description;
-                const thumbnail = item.thumbnails[0].url;
-                
-                // ショート動画は180秒未満の動画とみなす
-                if (item.duration && parseDuration(item.duration) <= 180) {
-                  channelShortsDiv.innerHTML += `
-                    <div>
-                      <h3><a href="/v/watch/?v=${videoId}">${title}</a></h3>
-                      <p>${description}</p>
-                      <img src="${thumbnail}" alt="${title}" style="width:120px; height:90px;">
-                    </div>
-                  `;
-                }
-              });
-            }
-          })
-          .catch(error => {
-            channelShortsDiv.textContent = 'ショート動画の取得に失敗しました。';
-            console.error('ショート動画取得エラー:', error);
-          });
-      }
     } else {
       channelInfoDiv.textContent = 'チャンネルIDがありません。URLを確認してください。';
-    }
-
-    // ISO 8601の期間形式（例: PT1M30S）を秒数に変換するヘルパー関数
-    function parseDuration(duration) {
-      const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-      let seconds = 0;
-      if (match) {
-        if (match[1]) seconds += parseInt(match[1], 10) * 3600; // 時
-        if (match[2]) seconds += parseInt(match[2], 10) * 60; // 分
-        if (match[3]) seconds += parseInt(match[3], 10); // 秒
-      }
-      return seconds;
     }
   </script>
 </body>
