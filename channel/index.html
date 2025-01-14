@@ -21,8 +21,8 @@
     <!-- チャンネルのショート動画一覧 -->
   </div>
 
- <script>
-    const API_KEY = 'AIzaSyCfLrK2FPzEZllvwhjmugZ8Bwvzp6GRVpU'; // APIキー
+  <script>
+    const INVIDIOUS_URL = 'https://invidious.nerdvpn.de'; // 任意のInvidiousインスタンスURL
     const params = new URLSearchParams(window.location.search);
     const channelId = params.get('c'); // チャンネルIDを取得
     const isShorts = params.has('short'); // ショート動画が要求されているか確認
@@ -32,44 +32,41 @@
     const channelShortsDiv = document.getElementById('channel-shorts');
 
     if (channelId) {
-      // チャンネル情報を取得
-      fetch(`https://www.googleapis.com/youtube/v3/channels?id=${channelId}&part=snippet,statistics&key=${API_KEY}`)
+      // チャンネル情報を取得（Invidious API）
+      fetch(`${INVIDIOUS_URL}/api/v1/channels/${channelId}`)
         .then(response => response.json())
         .then(data => {
-          if (data.items && data.items.length > 0) {
-            const channel = data.items[0];
-            const title = channel.snippet.title;
-            const description = channel.snippet.description;
-            const icon = channel.snippet.thumbnails.default.url;
-            const subscriberCount = channel.statistics.subscriberCount;
+          const title = data.title;
+          const description = data.description;
+          const icon = data.avatar;
+          const subscriberCount = data.subscribers;
 
-            // チャンネル情報を表示
-            channelInfoDiv.innerHTML = `
-              <h2>${title}</h2>
-              <img src="${icon}" alt="${title}" style="width:100px; height:100px; border-radius:50%;">
-              <p>${description}</p>
-              <p>登録者数: ${subscriberCount}</p>
-            `;
-          }
+          // チャンネル情報を表示
+          channelInfoDiv.innerHTML = `
+            <h2>${title}</h2>
+            <img src="${icon}" alt="${title}" style="width:100px; height:100px; border-radius:50%;">
+            <p>${description}</p>
+            <p>登録者数: ${subscriberCount}</p>
+          `;
         })
         .catch(error => {
           channelInfoDiv.textContent = 'チャンネル情報の取得に失敗しました。';
           console.error('チャンネル情報取得エラー:', error);
         });
 
-      // チャンネルの動画一覧を取得
-      fetch(`https://www.googleapis.com/youtube/v3/search?channelId=${channelId}&part=snippet&type=video&maxResults=10&key=${API_KEY}`)
+      // チャンネルの動画一覧を取得（Invidious API）
+      fetch(`${INVIDIOUS_URL}/api/v1/search?channelId=${channelId}&type=video`)
         .then(response => response.json())
         .then(data => {
-          if (data.items && data.items.length > 0) {
-            data.items.forEach(item => {
-              const videoId = item.id.videoId;
-              const title = item.snippet.title;
-              const description = item.snippet.description;
-              const thumbnail = item.snippet.thumbnails.default.url;
+          if (data && data.length > 0) {
+            data.forEach(item => {
+              const videoId = item.videoId;
+              const title = item.title;
+              const description = item.description;
+              const thumbnail = item.thumbnails[0].url;
 
               // 通常動画のみを表示（ショート動画は除外）
-              if (!isShorts || (isShorts && item.snippet.duration && parseDuration(item.snippet.duration) <= 180)) {
+              if (!isShorts || (isShorts && item.duration && parseDuration(item.duration) <= 180)) {
                 channelVideosDiv.innerHTML += `
                   <div>
                     <h3><a href="/v/watch/?v=${videoId}">${title}</a></h3>
@@ -88,18 +85,18 @@
 
       // ショート動画の処理（通常動画とは別）
       if (isShorts) {
-        fetch(`https://www.googleapis.com/youtube/v3/search?channelId=${channelId}&part=snippet&type=video&maxResults=10&key=${API_KEY}`)
+        fetch(`${INVIDIOUS_URL}/api/v1/search?channelId=${channelId}&type=video`)
           .then(response => response.json())
           .then(data => {
-            if (data.items && data.items.length > 0) {
-              data.items.forEach(item => {
-                const videoId = item.id.videoId;
-                const title = item.snippet.title;
-                const description = item.snippet.description;
-                const thumbnail = item.snippet.thumbnails.default.url;
+            if (data && data.length > 0) {
+              data.forEach(item => {
+                const videoId = item.videoId;
+                const title = item.title;
+                const description = item.description;
+                const thumbnail = item.thumbnails[0].url;
                 
                 // ショート動画は180秒未満の動画とみなす
-                if (item.snippet.duration && parseDuration(item.snippet.duration) <= 180) {
+                if (item.duration && parseDuration(item.duration) <= 180) {
                   channelShortsDiv.innerHTML += `
                     <div>
                       <h3><a href="/v/watch/?v=${videoId}">${title}</a></h3>
