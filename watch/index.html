@@ -1,29 +1,42 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>アドレスバーから Video ID 抽出</title>
+  <meta charset="UTF-8"> <!-- ページの文字コードをUTF-8に設定 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- レスポンシブデザインを有効化 -->
+  <title>YouTube 動的埋め込み</title> <!-- ページタイトル -->
 </head>
 <body>
-  <h1>Video ID 抽出ツール</h1>
-  <p id="result"></p>
+  <h1>YouTube 動画埋め込み</h1> <!-- ページの見出し -->
+  <p>アドレスバーのURLからVideo IDを取得して埋め込みます。</p> <!-- 説明文 -->
+  <div id="player">
+    <!-- YouTube動画が埋め込まれる場所 -->
+  </div>
 
   <script>
-    // URLのクエリパラメータを取得する関数
-    function getQueryParam(param) {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(param);
-    }
+    // URLからクエリパラメータを取得するオブジェクトを作成
+    const params = new URLSearchParams(window.location.search);
+    
+    // クエリパラメータの 'v' の値を取得（例: ?v=abc123）
+    const videoid = params.get('v');
 
-    // videoid を取得して表示
-    const videoid = getQueryParam('v');
-    const resultElement = document.getElementById('result');
+    // 動画を埋め込むためのdivを取得
+    const playerDiv = document.getElementById('player');
 
+    // videoidが存在する場合
     if (videoid) {
-      resultElement.textContent = `抽出された Video ID: ${videoid}`;
+      // 動的にYouTube埋め込み用の<iframe>を生成
+      playerDiv.innerHTML = `
+        <video autoplay="" poster="https://img.youtube.com/vi/${videoid}/0.jpg">
+<source label="livestream" 
+          src="https://inv-ca1-c.nadeko.net/latest_version?id=${videoid}&itag=18" <!-- 動画の埋め込みURL -->
+          frameborder="0" <!-- フレームの境界線を非表示 -->
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" <!-- 再生機能の許可設定 -->
+          allowfullscreen> <!-- フルスクリーンを許可 -->
+        </video>
+      `;
     } else {
-      resultElement.textContent = 'Video ID が見つかりません。URLを確認してください。';
+      // videoidが存在しない場合、エラーメッセージを表示
+      playerDiv.textContent = 'Video ID が見つかりません。URLを確認してください。';
     }
   </script>
 </body>
