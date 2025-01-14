@@ -3,6 +3,144 @@
 <head>
   <meta charset="UTF-8"> <!-- ページの文字コードをUTF-8に設定 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- レスポンシブデザインを有効化 -->
+  <title>YouTube 動的情報表示</title> <!-- ページタイトル -->
+  <style>
+    /* スタイル設定 */
+    body { font-family: Arial, sans-serif; line-height: 1.6; }
+    .section { margin-bottom: 20px; }
+    h2 { color: #444; }
+    ul { list-style-type: none; padding: 0; }
+    li { margin-bottom: 10px; }
+    video { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>YouTube 動画の詳細情報</h1> <!-- ページの見出し -->
+  <div id="player" class="section">
+    <!-- YouTube動画が埋め込まれる場所 -->
+  </div>
+  <div id="description" class="section">
+    <h2>動画の概要欄</h2>
+    <p id="video-desc"></p>
+  </div>
+  <div id="related-videos" class="section">
+    <h2>関連動画</h2>
+    <ul id="related-list"></ul>
+  </div>
+  <div id="channel-details" class="section">
+    <h2>チャンネル詳細</h2>
+    <p id="channel-info"></p>
+  </div>
+
+  <script>
+    const API_KEY = 'YOUR_API_KEY'; // ここにYouTube Data APIキーを設定
+    const params = new URLSearchParams(window.location.search); // URLのクエリパラメータを解析
+    const videoid = params.get('v'); // 'v' パラメータからVideo IDを取得
+
+    const playerDiv = document.getElementById('player');
+    const descriptionDiv = document.getElementById('video-desc');
+    const relatedList = document.getElementById('related-list');
+    const channelInfoDiv = document.getElementById('channel-info');
+
+    if (videoid) {
+      // 動画を埋め込む
+      playerDiv.innerHTML = `
+        <video controls autoplay poster="https://img.youtube.com/vi/${videoid}/0.jpg" width="640" height="360">
+          <source src="https://inv-ca1-c.nadeko.net/latest_version?id=${videoid}&itag=18" type="video/mp4">
+          お使いのブラウザは動画タグをサポートしていません。
+        </video>
+      `;
+
+      // YouTube Data API エンドポイント
+      const videoDetailsUrl = `https://www.googleapis.com/youtube/v3/videos?id=${videoid}&part=snippet&key=${API_KEY}`;
+      const relatedVideosUrl = `https://www.googleapis.com/youtube/v3/search?relatedToVideoId=${videoid}&type=video&part=snippet&key=${API_KEY}`;
+
+      // 動画情報を取得して概要欄とチャンネル情報を表示
+      fetch(videoDetailsUrl)
+        .then(response => response.json())
+        .then(data => {
+          if (data.items.length > 0) {
+            const snippet = data.items[0].snippet;
+
+            // 概要欄を表示
+            descriptionDiv.textContent = snippet.description;
+
+            // チャンネル情報を取得
+            const channelId = snippet.channelId;
+            const channelTitle = snippet.channelTitle;
+
+            // チャンネル詳細を取得
+            const channelDetailsUrl = `https://www.googleapis.com/youtube/v3/channels?id=${channelId}&part=snippet,statistics&key=${API_KEY}`;
+            fetch(channelDetailsUrl)
+              .then(response => response.json())
+              .then(channelData => {
+                if (channelData.items.length > 0) {
+                  const channelSnippet = channelData.items[0].snippet;
+                  const channelStats = channelData.items[0].statistics;
+
+                  channelInfoDiv.innerHTML = `
+                    <strong>チャンネル名:</strong> ${channelTitle}<br>
+                    <strong>説明:</strong> ${channelSnippet.description}<br>
+                    <strong>登録者数:</strong> ${channelStats.subscriberCount} 人<br>
+                    <strong>動画数:</strong> ${channelStats.videoCount} 本<br>
+                  `;
+                } else {
+                  channelInfoDiv.textContent = 'チャンネル情報が見つかりませんでした。';
+                }
+              })
+              .catch(error => {
+                channelInfoDiv.textContent = 'チャンネル情報の取得中にエラーが発生しました。';
+                console.error(error);
+              });
+          } else {
+            descriptionDiv.textContent = '概要欄が見つかりませんでした。';
+          }
+        })
+        .catch(error => {
+          descriptionDiv.textContent = '概要欄の取得中にエラーが発生しました。';
+          console.error(error);
+        });
+
+      // 関連動画を取得して表示
+      fetch(relatedVideosUrl)
+        .then(response => response.json())
+        .then(data => {
+          if (data.items.length > 0) {
+            data.items.forEach(item => {
+              const videoItem = document.createElement('li');
+              videoItem.innerHTML = `
+                <a href="?v=${item.id.videoId}" target="_blank">
+                  ${item.snippet.title}
+                </a>
+              `;
+              relatedList.appendChild(videoItem);
+            });
+          } else {
+            relatedList.innerHTML = '<li>関連動画が見つかりませんでした。</li>';
+          }
+        })
+        .catch(error => {
+          relatedList.innerHTML = '<li>関連動画の取得中にエラーが発生しました。</li>';
+          console.error(error);
+        });
+    } else {
+      // videoid がない場合はエラーメッセージを表示
+      playerDiv.textContent = 'Video ID が見つかりません。URLを確認してください。';
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8"> <!-- ページの文字コードをUTF-8に設定 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- レスポンシブデザインを有効化 -->
   <title>YouTube 動的埋め込み</title> <!-- ページタイトル -->
 </head>
 <body>
