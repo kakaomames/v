@@ -3,30 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="channel-info"></title>
+  <title id="title"></title>
 </head>
 <body>
-<form class="pure-form" action="/v/search" method="get">
-     <fieldset>
-          <input type="search" id="searchbox" autocomplete="on" autocorrect="on" autocapitalize="none" spellcheck="false" name="q" placeholder="検索" title="検索">
-     </fieldset>
-  </form>  
+  <h1>YouTube チャンネル詳細</h1>
   
   <div id="channel-info">
     <!-- チャンネル情報を表示 -->
   </div>
 
   <div id="channel-videos">
-    <!-- チャンネルの動画一覧 -->
+    <h2>通常の動画</h2>
+    <!-- チャンネルの通常動画一覧 -->
+  </div>
+
+  <div id="channel-shorts">
+    <h2>YouTube Shorts</h2>
+    <!-- チャンネルのショート動画一覧 -->
   </div>
 
   <script>
     const API_KEY = 'AIzaSyCfLrK2FPzEZllvwhjmugZ8Bwvzp6GRVpU'; // APIキー
     const params = new URLSearchParams(window.location.search);
     const channelId = params.get('c'); // チャンネルIDを取得
+    const isShorts = params.has('short'); // ショート動画が要求されているか確認
 
     const channelInfoDiv = document.getElementById('channel-info');
     const channelVideosDiv = document.getElementById('channel-videos');
+    const channelShortsDiv = document.getElementById('channel-shorts');
 
     if (channelId) {
       // チャンネル情報を取得
@@ -65,14 +69,16 @@
               const description = item.snippet.description;
               const thumbnail = item.snippet.thumbnails.default.url;
 
-              // 動画情報を表示
-              channelVideosDiv.innerHTML += `
-                <div>
-                  <h3><a href="/v/watch/?v=${videoId}">${title}</a></h3>
-                  <p>${description}</p>
-                  <img src="${thumbnail}" alt="${title}" style="width:120px; height:90px;">
-                </div>
-              `;
+              // 通常動画を表示
+              if (!isShorts || (isShorts && item.snippet.duration && parseDuration(item.snippet.duration) <= 60)) {
+                channelVideosDiv.innerHTML += `
+                  <div>
+                    <h3><a href="/v/watch/?v=${videoId}">${title}</a></h3>
+                    <p>${description}</p>
+                    <img src="${thumbnail}" alt="${title}" style="width:120px; height:90px;">
+                  </div>
+                `;
+              }
             });
           }
         })
@@ -80,8 +86,51 @@
           channelVideosDiv.textContent = 'チャンネル動画の取得に失敗しました。';
           console.error('チャンネル動画取得エラー:', error);
         });
+
+      // ショート動画の処理（maxResultsを増やす場合もある）
+      if (isShorts) {
+        fetch(`https://www.googleapis.com/youtube/v3/search?channelId=${channelId}&part=snippet&type=video&maxResults=10&key=${API_KEY}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.items && data.items.length > 0) {
+              data.items.forEach(item => {
+                const videoId = item.id.videoId;
+                const title = item.snippet.title;
+                const description = item.snippet.description;
+                const thumbnail = item.snippet.thumbnails.default.url;
+                
+                // ショート動画は60秒未満の動画とみなす
+                if (item.snippet.duration && parseDuration(item.snippet.duration) <= 60) {
+                  channelShortsDiv.innerHTML += `
+                    <div>
+                      <h3><a href="/v/watch/?v=${videoId}">${title}</a></h3>
+                      <p>${description}</p>
+                      <img src="${thumbnail}" alt="${title}" style="width:120px; height:90px;">
+                    </div>
+                  `;
+                }
+              });
+            }
+          })
+          .catch(error => {
+            channelShortsDiv.textContent = 'ショート動画の取得に失敗しました。';
+            console.error('ショート動画取得エラー:', error);
+          });
+      }
     } else {
       channelInfoDiv.textContent = 'チャンネルIDがありません。URLを確認してください。';
+    }
+
+    // ISO 8601の期間形式（例: PT1M30S）を秒数に変換するヘルパー関数
+    function parseDuration(duration) {
+      const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+      let seconds = 0;
+      if (match) {
+        if (match[1]) seconds += parseInt(match[1], 10) * 3600; // 時
+        if (match[2]) seconds += parseInt(match[2], 10) * 60; // 分
+        if (match[3]) seconds += parseInt(match[3], 10); // 秒
+      }
+      return seconds;
     }
   </script>
 </body>
