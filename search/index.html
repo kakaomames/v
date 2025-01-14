@@ -6,7 +6,11 @@
   <title>YouTube 検索結果</title>
 </head>
 <body>
-  <h1>YouTube 検索結果</h1>
+<form class="pure-form" action="/v/search" method="get">
+     <fieldset>
+          <input type="search" id="searchbox" autocomplete="on" autocorrect="on" autocapitalize="none" spellcheck="false" name="q" placeholder="検索" title="検索">
+     </fieldset>
+  </form>  
   <p>検索キーワード「<span id="search-word"></span>」の結果を表示します。</p>
   
   <div id="search-results">
@@ -40,7 +44,7 @@
                 const videoId = item.id.videoId;
                 searchResultsDiv.innerHTML += `
                   <div>
-                    <h3><a href="/v//watch/?v=${videoId}">${title}</a></h3>
+                    <h3><a href="/v/watch/?v=${videoId}">${title}</a></h3>
                     <p>${description}</p>
                     <img src="${thumbnail}" alt="${title}" style="width:120px; height:90px;">
                   </div>
