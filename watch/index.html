@@ -27,11 +27,11 @@
     <h2>関連動画</h2>
     <ul id="related-list"></ul>
   </div>
-  <div id="channel-details" class="section">
+  <!--<div id="channel-details" class="section">
     <h2>チャンネル詳細</h2>
     <p id="channel-info"></p>
   </div>
-
+-->
   <script>
     const API_KEY = 'AIzaSyCfLrK2FPzEZllvwhjmugZ8Bwvzp6GRVpU'; // ここにYouTube Data APIキーを設定
     const params = new URLSearchParams(window.location.search); // URLのクエリパラメータを解析
@@ -79,10 +79,10 @@
                   const channelStats = channelData.items[0].statistics;
 
                   channelInfoDiv.innerHTML = `
-                    <strong>チャンネル名:</strong> ${channelTitle}<br>
+                    <!--<strong>チャンネル名:</strong> ${channelTitle}<br>
                     <strong>説明:</strong> ${channelSnippet.description}<br>
                     <strong>登録者数:</strong> ${channelStats.subscriberCount} 人<br>
-                    <strong>動画数:</strong> ${channelStats.videoCount} 本<br>
+                    <strong>動画数:</strong> ${channelStats.videoCount} 本<br>-->
                   `;
                 } else {
                   channelInfoDiv.textContent = 'チャンネル情報が見つかりませんでした。';
