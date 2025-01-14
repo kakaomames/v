@@ -22,7 +22,7 @@
   </div>
 
   <script>
-    const INVIDIOUS_URL = 'https://invidious.nerdvpn.de'; // 任意のInvidiousインスタンスURL
+    const INVIDIOUS_URL = 'https://xn--56h2hd81038bqea0bm6birn7fz9e971bpar2f591b.easterndns.com'; // 任意のInvidiousインスタンスURL
     const params = new URLSearchParams(window.location.search);
     const channelId = params.get('c'); // チャンネルIDを取得
     const isShorts = params.has('short'); // ショート動画が要求されているか確認
@@ -33,7 +33,7 @@
 
     if (channelId) {
       // チャンネル情報を取得（Invidious API）
-      fetch(`${INVIDIOUS_URL}/api/v1/channels/${channelId}`)
+      fetch(`${INVIDIOUS_URL}/channels/${channelId}`)
         .then(response => response.json())
         .then(data => {
           const title = data.title;
