@@ -40,7 +40,7 @@
                 const videoId = item.id.videoId;
                 searchResultsDiv.innerHTML += `
                   <div>
-                    <h3><a href="/watch?v=${videoId}">${title}</a></h3>
+                    <h3><a href="/v//watch/?v=${videoId}">${title}</a></h3>
                     <p>${description}</p>
                     <img src="${thumbnail}" alt="${title}" style="width:120px; height:90px;">
                   </div>
@@ -53,7 +53,7 @@
                 
                 searchResultsDiv.innerHTML += `
                   <div>
-                    <h3><a href="/channel/?c=${channelId}">${channelTitle}</a></h3>
+                    <h3><a href="/v/channel/?c=${channelId}">${channelTitle}</a></h3>
                     <img src="${channelThumbnail}" alt="${channelTitle}" style="width:120px; height:120px; border-radius:50%;">
                     <p>${description}</p>
                   </div>
