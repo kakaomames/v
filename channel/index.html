@@ -100,7 +100,7 @@
                 const thumbnail = item.snippet.thumbnails.default.url;
                 
                 // ショート動画は60秒未満の動画とみなす
-                if (item.snippet.duration && parseDuration(item.snippet.duration) <= 60) {
+                if (item.snippet.duration && parseDuration(item.snippet.duration) <= 180) {
                   channelShortsDiv.innerHTML += `
                     <div>
                       <h3><a href="/v/watch/?v=${videoId}">${title}</a></h3>
