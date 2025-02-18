@@ -1,6 +1,6 @@
 const CACHE_NAME = "pwa-cache-v1";
 const urlsToCache = [
-  "/",
+  "https://www.youtube.com/s/desktop/e208051c/img/logos/favicon_144x144.png",
   "./index.html",
   "./watch/index.html",
   "./channel/index.html",
