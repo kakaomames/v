@@ -5,6 +5,7 @@ const urlsToCache = [
   "https://inv-us2-c.nadeko.net/latest_version",
   "https://www.googleapis.com/youtube/v3/videos",
   "https://www.googleapis.com/youtube/v3/search",
+  "https://test-five-gules-98.vercel.app/channel",
   "./index.html",
   "./watch/index.html",
   "./channel/index.html",
