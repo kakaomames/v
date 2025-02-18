@@ -4,7 +4,9 @@ const urlsToCache = [
   "./index.html",
   "./watch/index.html",
   "./channel/index.html",
-  "./search/index.html"
+  "./search/index.html",
+  "/watch/index.html",
+  "/channel/index.html"
 ];
 
 // インストール時にキャッシュする
