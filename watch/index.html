@@ -87,22 +87,26 @@ if ("serviceWorker" in navigator) {
           
           お使いのブラウザは動画タグをサポートしていません。
         </video><br>
-        <button class="collapsible">ダウンロード一覧</button>
+        <details>
+  <summary><strong>ダウンロード一覧</strong></summary>
         <h1>数字はitagを示しています。itag一覧から適切なのを選んでください。</h1>
     <div class="content">
-        <button class="collapsible">動画ダウンロード一覧</button>
+        <details>
+  <summary><strong>動画ダウンロード一覧</strong></summary>
     <div class="content">
         <a href="https://inv-us2-c.nadeko.net/latest_version?id=${videoId}&itag=18&check=">18をダウンロード</a>
         <a href="https://example.com/page2">Example 2</a>
         <a href="https://example.com/page3">Example 3</a>
-    </div>
-    <button class="collapsible">音声ダウンロード一覧</button>
+    </div></details>
+    <details>
+  <summary><strong>音声ダウンロード一覧</strong></summary>
     <div class="content">
         <a href="https://inv-us2-c.nadeko.net/latest_version?id=${videoId}&itag=140&check=">140をダウンロード</a>
         <a href="https://example.com/page2">Example 2</a>
         <a href="https://example.com/page3">Example 3</a>
     </div>
-    </div>
+    </details>
+    </div></details>
         <br><details>
   <summary><strong>📜 itagリストを表示する</strong></summary>
   <iframe src="https://pokemogukunns.github.io/v/" width="100%" height="500px" style="border: none;"></iframe>
