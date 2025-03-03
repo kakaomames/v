@@ -57,7 +57,12 @@ if ("serviceWorker" in navigator) {
     <h2 id="video-title">video-title</h2><br>
     <p id="video-description"></p><br>
   </div>
-
+    <script>
+        document.querySelector('.collapsible').addEventListener('click', function() {
+            const content = this.nextElementSibling;
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        });
+    </script>
   <!-- チャンネル情報 -->
   <div id="channel-info"></div>
 
@@ -82,8 +87,22 @@ if ("serviceWorker" in navigator) {
           
           お使いのブラウザは動画タグをサポートしていません。
         </video><br>
-        
-        <a href="https://inv-us2-c.nadeko.net/latest_version?id=${videoId}&itag=18&check=">videoをダウンロード</a><br>
+        <button class="collapsible">ダウンロード一覧</button>
+    <div class="content">
+        <button class="collapsible">動画ダウンロード一覧</button>
+    <div class="content">
+        <a href="https://inv-us2-c.nadeko.net/latest_version?id=${videoId}&itag=18&check=">videoをダウンロード</a>
+        <a href="https://example.com/page2">Example 2</a>
+        <a href="https://example.com/page3">Example 3</a>
+    </div>
+    <button class="collapsible">音声ダウンロード一覧</button>
+    <div class="content">
+        <a href="https://example.com">Example 1</a>
+        <a href="https://example.com/page2">Example 2</a>
+        <a href="https://example.com/page3">Example 3</a>
+    </div>
+    </div>
+        <br>
         <a href="https://inv-us2-c.nadeko.net/latest_version?id=${videoId}&itag=140&check=">videoをダウンロード</a><br>
         <a href="https://inv-us2-c.nadeko.net/latest_version?id=${videoId}&itag=18&check=">videoをダウンロード</a><br>
         <a href="https://inv-us2-c.nadeko.net/latest_version?id=${videoId}&itag=140&check=">videoをダウンロード</a><br>
