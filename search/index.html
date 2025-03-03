@@ -20,14 +20,14 @@ if ("serviceWorker" in navigator) {
           <input type="search" id="searchbox" autocomplete="on" autocorrect="on" autocapitalize="none" spellcheck="false" name="q" placeholder="検索" title="検索">
      </fieldset>
   </form>  
-  <p>検索キーワード「<span id="search-word"></span>」の結果を表示します。</p>
+  <p>検索キーワード「<p id="search-word"></p>」の結果を表示します。</p>
   
   <div id="search-results">
     <!-- 検索結果を表示 -->
   </div>
 
   <script>
-    const API_KEY = 'AIzaSyCfLrK2FPzEZllvwhjmugZ8Bwvzp6GRVpU'; // APIキー
+    const API_KEY = 'AIzaSyApZ9YhMttem3N0ibnwApn8YeavaNd8zWA'; // APIキー
     const params = new URLSearchParams(window.location.search);
     const searchWord = params.get('q'); // 検索ワードを取得
 
