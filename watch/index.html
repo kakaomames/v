@@ -13,6 +13,35 @@ if ("serviceWorker" in navigator) {
     .catch((err) => console.log("Service Worker registration failed:", err));
 }
 </script>
+  <style>
+        .collapsible {
+            cursor: pointer;
+            padding: 10px;
+            font-size: 18px;
+            border: none;
+            text-align: left;
+            background-color: #f1f1f1;
+            width: 100%;
+        }
+
+        .content {
+            padding: 0 10px;
+            display: none;
+            overflow: hidden;
+            background-color: #f9f9f9;
+        }
+
+        .content a {
+            display: block;
+            padding: 8px 0;
+            color: #0077cc;
+            text-decoration: none;
+        }
+
+        .content a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
   <form class="pure-form" action="/v/search" method="get">
