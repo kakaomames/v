@@ -1,7 +1,7 @@
 {
   "name": "youtube",
   "short_name": "youtube",
-  "start_url": "https://pokemogukunns.github.io/v/",
+  "start_url": "https://pokemogukunns.github.io/v/home.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
