@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="https://www.youtube.com/s/desktop/e208051c/img/logos/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="https://www.youtube.com/s/desktop/e208051c/img/logos/favicon_32x32.png" sizes="32x32">
+  <link rel="icon" href="https://www.youtube.com/s/desktop/e208051c/img/logos/favicon_48x48.png" sizes="48x48">
+  <link rel="icon" href="https://www.youtube.com/s/desktop/e208051c/img/logos/favicon_96x96.png" sizes="96x96">
+  <link rel="icon" href="https://www.youtube.com/s/desktop/e208051c/img/logos/favicon_144x144.png" sizes="144x144">
+  <link rel="manifest" href="manifest.json">
+  <title>チャンネル情報</title>
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./serviceWorker.js")
+        .then(() => console.log("Service Worker registered"))
+        .catch((err) => console.log("Service Worker registration failed:", err));
+    }
+  </script>
+</head>
+<body>
+
+  <div id="channel-info">
+    チャンネル情報を取得中...
+  </div>
+
+  <script>
+    const apiUrl = 'https://test-five-gules-98.vercel.app'; // Flask APIのURL
+    const params = new URLSearchParams(window.location.search);
+    const channelId = params.get('c'); // URLのクエリパラメータからチャンネルIDを取得
+    const channelInfoDiv = document.getElementById('channel-info');
+
+    if (channelId) {
+      fetch(`${apiUrl}/channel/${channelId}`)
+        .then(response => response.text())
+        .then(data => {
+          // 画像リンク変換 (/vi/〜 → https://img.youtube.com/vi/〜)
+          data = data.replace(/<img([^>]+)src="\/vi\/(.*?)\/.*?"/g, '<img$1src="https://img.youtube.com/vi/$2/0.jpg"');
+
+          // リンク変換 (/channel/〜 → /v/channel?c=〜)
+          data = data.replace(/<a([^>]+)href="\/channel\/(.*?)"/g, '<a$1href="/v/channel?c=$2"');
+
+          // 編集後のHTMLを表示
+          channelInfoDiv.innerHTML = data;
+        })
+        .catch(error => {
+          channelInfoDiv.textContent = 'チャンネル情報の取得に失敗しました。';
+          console.error('チャンネル情報取得エラー:', error);
+        });
+    } else {
+      channelInfoDiv.textContent = 'チャンネルIDがありません。URLを確認してください。';
+    }
+  </script>
+
+</body>
+</html>
