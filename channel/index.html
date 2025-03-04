@@ -9,12 +9,11 @@
   <link rel="icon" href="https://www.youtube.com/s/desktop/e208051c/img/logos/favicon_96x96.png" sizes="96x96">
   <link rel="icon" href="https://www.youtube.com/s/desktop/e208051c/img/logos/favicon_144x144.png" sizes="144x144">
   <link rel="manifest" href="manifest.json">
-  <title>チャンネル情報</title>
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("./serviceWorker.js")
-        .then(() => console.log("Service Worker registered"))
-        .catch((err) => console.log("Service Worker registration failed:", err));
+        .then(() => console.log("サービスワーカー登録済み"))
+        .catch((err) => console.log("サービスワーカーの登録に失敗しました:", err));
     }
   </script>
 </head>
