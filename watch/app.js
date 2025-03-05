@@ -1,4 +1,4 @@
-const apiKey = 'YOUR_API_KEY';  // ここにAPIキーを入力
+const apiKey = 'AIzaSyApZ9YhMttem3N0ibnwApn8YeavaNd8zWA';  // ここにAPIキーを入力
 
 function searchVideos() {
     const query = document.getElementById('search-query').value;
