@@ -7,6 +7,7 @@
     <meta property="og:title" content="動画タイトル">
     <meta property="og:description" content="動画の説明">
     <meta name="theme-color" content="#ff0000">
+    <title>YouTube チャンネルビューア</title>
 </head>
 <body>
     <div id="channel-info">
@@ -23,14 +24,18 @@
             fetch(`${apiUrl}/channel/${channelId}`)
                 .then(response => response.text())
                 .then(data => {
-                    // 画像リンク変換 (/vi/〜 → https://img.youtube.com/vi/〜)
-                    data = data.replace(/<img([^>]+)src="\/vi\/(.*?)\/.*?"/g, '<img$1src="https://img.youtube.com/vi/$2/0.jpg"');
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
 
-                    // リンク変換 (/channel/〜 → /v/channel?c=〜)
-                    data = data.replace(/<a([^>]+)href="\/channel\/(.*?)"/g, '<a$1href="/v/channel?c=$2"');
+                    // 不要な <script> タグを削除
+                    doc.querySelectorAll('script').forEach(script => {
+                        if (!script.textContent.includes('ytInitialData') && !script.type.includes('application/ld+json')) {
+                            script.remove();
+                        }
+                    });
 
-                    // 編集後のHTMLを表示
-                    channelInfoDiv.innerHTML = data;
+                    // フィルタリング後のHTMLを適用
+                    channelInfoDiv.innerHTML = doc.body.innerHTML;
                 })
                 .catch(error => {
                     channelInfoDiv.textContent = 'チャンネル情報の取得に失敗しました。';
