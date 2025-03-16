@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:image" content="https://i.ytimg.com/...">
+    <meta property="og:title" content="動画タイトル">
+    <meta property="og:description" content="動画の説明">
+    <meta name="theme-color" content="#ff0000">
+    <title>YouTube チャンネルビューア</title>
+</head>
+<body>
+    <div id="channel-info">
+        チャンネル情報を取得中...
+    </div>
+
+    <script>
+        const apiUrl = 'https://test-five-gules-98.vercel.app'; // Flask APIのURL
+        const params = new URLSearchParams(window.location.search);
+        const channelId = params.get('c'); // URLのクエリパラメータからチャンネルIDを取得
+        const channelInfoDiv = document.getElementById('channel-info');
+
+        if (channelId) {
+            fetch(`${apiUrl}/channel/${channelId}`)
+                .then(response => response.text())
+                .then(data => {
+                    // 画像リンク変換 (/vi/〜 → https://img.youtube.com/vi/〜)
+                    data = data.replace(/<img([^>]+)src="\/vi\/(.*?)\/.*?"/g, '<img$1src="https://img.youtube.com/vi/$2/0.jpg"');
+
+                    // リンク変換 (/channel/〜 → /v/channel?c=〜)
+                    data = data.replace(/<a([^>]+)href="\/channel\/(.*?)"/g, '<a$1href="/v/channel?c=$2"');
+
+                    // 編集後のHTMLを表示
+                    channelInfoDiv.innerHTML = data;
+                })
+                .catch(error => {
+                    channelInfoDiv.textContent = 'チャンネル情報の取得に失敗しました。';
+                    console.error('チャンネル情報取得エラー:', error);
+                });
+        } else {
+            channelInfoDiv.textContent = 'チャンネルIDがありません。URLを確認してください。';
+        }
+    </script>
+</body>
+</html>
