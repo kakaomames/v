@@ -8,12 +8,14 @@
     <div id="channel-info">
         チャンネル情報を取得中...
     </div>
+    <div id="video-list"></div>
 
     <script>
         const apiUrl = 'https://test-five-gules-98.vercel.app'; // Flask APIのURL
         const params = new URLSearchParams(window.location.search);
         const channelId = params.get('c'); // URLのクエリパラメータからチャンネルIDを取得
         const channelInfoDiv = document.getElementById('channel-info');
+        const videoListDiv = document.getElementById('video-list');
 
         if (channelId) {
             fetch(`${apiUrl}/channel/${channelId}`)
@@ -21,6 +23,37 @@
                 .then(data => {
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(data, 'text/html');
+
+                    // ytInitialDataを取得
+                    const scriptTags = doc.querySelectorAll('script');
+                    let ytData = null;
+                    scriptTags.forEach(script => {
+                        if (script.textContent.includes('ytInitialData')) {
+                            const match = script.textContent.match(/ytInitialData\s*=\s*(\{.*?\});/);
+                            if (match) {
+                                ytData = JSON.parse(match[1]);
+                            }
+                        }
+                    });
+
+                    // 動画リストを生成
+                    if (ytData) {
+                        const videoItems = ytData.contents.twoColumnBrowseResultsRenderer.tabs[1].tabRenderer.content.richGridRenderer.contents;
+                        let videoHtml = '<h2>動画一覧</h2><ul>';
+                        videoItems.forEach(item => {
+                            if (item.richItemRenderer) {
+                                const video = item.richItemRenderer.content.videoRenderer;
+                                if (video) {
+                                    const title = video.title.runs[0].text;
+                                    const videoId = video.videoId;
+                                    const thumbnail = video.thumbnail.thumbnails[0].url;
+                                    videoHtml += `<li><img src="${thumbnail}" alt="${title}" width="120"> <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">${title}</a></li>`;
+                                }
+                            }
+                        });
+                        videoHtml += '</ul>';
+                        videoListDiv.innerHTML = videoHtml;
+                    }
 
                     // 不要な <script> タグを削除
                     doc.querySelectorAll('script').forEach(script => {
