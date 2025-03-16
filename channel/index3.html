@@ -3,17 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ff0000">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #channel-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #channel-info img {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+        }
+        #video-list {
+            margin-top: 20px;
+        }
+        .video-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .video-item img {
+            width: 120px;
+            height: auto;
+            border-radius: 8px;
+        }
+        .skeleton {
+            background: #ddd;
+            border-radius: 8px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+    </style>
 </head>
 <body>
     <div id="channel-info">
-        チャンネル情報を取得中...
+        <div class="skeleton" style="width: 50px; height: 50px; border-radius: 50%;"></div>
+        <div>
+            <div class="skeleton" style="width: 200px; height: 20px;"></div>
+            <div class="skeleton" style="width: 150px; height: 15px; margin-top: 5px;"></div>
+        </div>
     </div>
-    <div id="video-list"></div>
+
+    <div id="video-list">
+        <h2>動画一覧</h2>
+        <div class="skeleton" style="width: 100%; height: 150px;"></div>
+    </div>
 
     <script>
-        const apiUrl = 'https://test-five-gules-98.vercel.app'; // Flask APIのURL
+        const apiUrl = 'https://test-five-gules-98.vercel.app';
         const params = new URLSearchParams(window.location.search);
-        const channelId = params.get('c'); // URLのクエリパラメータからチャンネルIDを取得
+        const channelId = params.get('c');
         const channelInfoDiv = document.getElementById('channel-info');
         const videoListDiv = document.getElementById('video-list');
 
@@ -24,10 +73,8 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(data, 'text/html');
 
-                    // ytInitialDataを取得
-                    const scriptTags = doc.querySelectorAll('script');
                     let ytData = null;
-                    scriptTags.forEach(script => {
+                    doc.querySelectorAll('script').forEach(script => {
                         if (script.textContent.includes('ytInitialData')) {
                             const match = script.textContent.match(/ytInitialData\s*=\s*(\{.*?\});/);
                             if (match) {
@@ -36,10 +83,24 @@
                         }
                     });
 
-                    // 動画リストを生成
                     if (ytData) {
+                        // チャンネル情報を取得
+                        const header = ytData.header.c4TabbedHeaderRenderer;
+                        const channelName = header.title;
+                        const channelThumbnail = header.avatar.thumbnails.slice(-1)[0].url;
+                        const subscriberCount = header.subscriberCountText.simpleText;
+
+                        channelInfoDiv.innerHTML = `
+                            <img src="${channelThumbnail}" alt="${channelName}">
+                            <div>
+                                <h2>${channelName}</h2>
+                                <p>${subscriberCount}</p>
+                            </div>
+                        `;
+
+                        // 動画リストを生成
                         const videoItems = ytData.contents.twoColumnBrowseResultsRenderer.tabs[1].tabRenderer.content.richGridRenderer.contents;
-                        let videoHtml = '<h2>動画一覧</h2><ul>';
+                        let videoHtml = '<h2>動画一覧</h2>';
                         videoItems.forEach(item => {
                             if (item.richItemRenderer) {
                                 const video = item.richItemRenderer.content.videoRenderer;
@@ -47,26 +108,20 @@
                                     const title = video.title.runs[0].text;
                                     const videoId = video.videoId;
                                     const thumbnail = video.thumbnail.thumbnails[0].url;
-                                    videoHtml += `<li><img src="${thumbnail}" alt="${title}" width="120"> <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">${title}</a></li>`;
+                                    videoHtml += `
+                                        <div class="video-item">
+                                            <img src="${thumbnail}" alt="${title}">
+                                            <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">${title}</a>
+                                        </div>
+                                    `;
                                 }
                             }
                         });
-                        videoHtml += '</ul>';
                         videoListDiv.innerHTML = videoHtml;
                     }
-
-                    // 不要な <script> タグを削除
-                    doc.querySelectorAll('script').forEach(script => {
-                        if (!script.textContent.includes('ytInitialData') && !script.type.includes('application/ld+json')) {
-                            script.remove();
-                        }
-                    });
-
-                    // フィルタリング後のHTMLを適用
-                    channelInfoDiv.innerHTML = doc.body.innerHTML;
                 })
                 .catch(error => {
-                    channelInfoDiv.textContent = 'チャンネル情報の取得に失敗しました。';
+                    channelInfoDiv.innerHTML = '<p style="color: red;">チャンネル情報の取得に失敗しました。</p>';
                     console.error('チャンネル情報取得エラー:', error);
                 });
         } else {
